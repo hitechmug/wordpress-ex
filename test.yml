@@ -1,0 +1,9 @@
+# test.yml
+default:
+    extensions:
+        Behat\MinkExtension\Extension:
+            base_url: http://test.gsdm.com
+            javascript_session: 'selenium2'
+            browser_name: chrome
+            goutte: ~
+            selenium2: ~

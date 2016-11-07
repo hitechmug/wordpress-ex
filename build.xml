@@ -1,0 +1,56 @@
+<project name="dotComTest" default="main" basedir=".">
+      <property environment="env"/>
+      <property name="wwwroot" value="C:\inetpub\vhost\test.gsdm.com\wp-content\themes\gsdm-tests" />
+    
+      <target name="Setup">
+
+        <delete dir="C:\inetpub\vhost\test.gsdm.com\wp-content" />
+        <delete dir="C:\inetpub\vhost\test.gsdm.com\svc" />
+        <mkdir dir="C:\inetpub\vhost\test.gsdm.com\svc"/>
+        <copydir src="${basedir}\..\..\..\wp-content" dest="C:\inetpub\vhost\test.gsdm.com\wp-content" />
+        <copydir src="${basedir}\..\..\..\svc" dest="C:\inetpub\vhost\test.gsdm.com\svc" />
+      </target>
+        
+      <target name="BehatSetup" depends="Setup">
+        <exec dir="C:\inetpub\vhost\test.gsdm.com\wp-content\themes\gsdm-tests" executable="./bin/behat.bat" resultproperty="execResult" failonerror="false">
+          <arg value='--format="html"' />
+          <arg value='--config="test.yml"' />
+          <arg value='--out=setupTest.html' />
+          <arg value='setupFeatures' />
+        </exec>
+
+        <echo message="Exit Code: ${execResult}" />
+        <copy file="C:\inetpub\vhost\test.gsdm.com\wp-content\themes\gsdm-tests\setupTest.html" todir="${env.WORKSPACE}" />        
+        <fail message="Failed to Setup Tests">
+          <condition>
+            <not>
+              <equals arg1="${execResult}" arg2="0"/>
+            </not>
+          </condition>
+        </fail>
+      </target>
+
+
+      <target name="Behat" depends="BehatSetup">
+          <exec dir="C:\inetpub\vhost\test.gsdm.com\wp-content\themes\gsdm-tests" executable="./bin/behat.bat" resultproperty="execFullResult" failonerror="false">
+            <arg value='--format="html"' />
+            <arg value='--config="test.yml"' />
+            <arg value='--out=test.html' />
+            <arg value='features' />
+          </exec>
+
+          <echo message="Exit Code: ${execFullResult}" />
+
+          <copy file="C:\inetpub\vhost\test.gsdm.com\wp-content\themes\gsdm-tests\test.html" todir="${env.WORKSPACE}" />          
+          
+          <fail message="Failed to Complete Test">
+            <condition>
+              <not>
+                <equals arg1="${execFullResult}" arg2="0"/>
+              </not>
+            </condition>
+          </fail>
+
+      </target>
+
+</project>
